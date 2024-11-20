@@ -30,7 +30,7 @@ jobs:
       - name: Build project
         run: npm run build
 
-  deploy:
+  build-and-push-docker-image:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -46,26 +46,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Subir la imagen Docker a Docker Hub sin reconstruirla
+      # Construir la imagen Docker
+      - name: Build Docker image
+        run: |
+          docker build -t jhonnystr/types-action:latest .
+
+      # Hacer push de la imagen a Docker Hub
       - name: Push Docker image to Docker Hub
         run: |
-          docker tag types-action:latest jhonnystr/types-action:latest
           docker push jhonnystr/types-action:latest
-
-      # Configuración y ejecución del contenedor de PostgreSQL
-      - name: Set up PostgreSQL container
-        run: |
-          docker run --name postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=solocali123# -e POSTGRES_DB=proyect_nest -p 5432:5432 -d postgres:latest
-
-      # Esperar a que PostgreSQL esté listo
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          until pg_isready -h localhost -p 5432 -U postgres; do
-            echo "Waiting for PostgreSQL to be ready..."
-            sleep 2
-          done
-
-      # Ejecutar el contenedor de la aplicación NestJS desde la imagen descargada
-      - name: Run Docker container for NestJS app
-        run: |
-          docker run -d -p 3000:3000 --link postgres:postgres --env DB_HOST=postgres --env DB_PORT=5432 --env DB_USERNAME=postgres --env DB_PASSWORD=solocali123# --env DB_DATABASE=proyect_nest jhonnystr/types-action:latest
