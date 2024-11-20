@@ -11,7 +11,7 @@ import { Customer } from './customer/customer.entity'; // Importa la entidad Cus
     // Configura la conexión a la base de datos usando TypeORM.
     TypeOrmModule.forRoot({
       type: 'postgres', // Especifica el tipo de base de datos que se está utilizando. En este caso, PostgreSQL.
-      host: 'localhost', // Usamos directamente el valor del host proporcionado.
+      host: 'jhonnypostgres', // Usamos directamente el valor del host proporcionado.
       port: 5432, // Usamos el puerto proporcionado.
       username: 'postgres', // Usamos el nombre de usuario proporcionado.
       password: 'solocali123#', // Usamos la contraseña proporcionada.
