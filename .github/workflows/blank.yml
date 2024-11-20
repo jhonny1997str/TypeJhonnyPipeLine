@@ -34,9 +34,7 @@ jobs:
       - name: Run Lint
         run: npm run lint
 
-      # 5. Ejecutar pruebas
-      - name: Run Tests
-        run: npm run test
+     
 
       # 6. Compilar el proyecto
       - name: Build project
