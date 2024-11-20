@@ -23,8 +23,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # Usa la versión de Node.js 18 para evitar problemas de compatibilidad
-          cache: 'npm' # Habilitar cache para las dependencias
+          node-version: 18
+          cache: 'npm'
 
       # 3. Instalar dependencias
       - name: Install dependencies
@@ -34,16 +34,14 @@ jobs:
       - name: Run Lint
         run: npm run lint
 
-     
-
-      # 6. Compilar el proyecto
+      # 5. Compilar el proyecto
       - name: Build project
         run: npm run build
 
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # Solo para la rama main
+    if: github.ref == 'refs/heads/main'
 
     steps:
       # 1. Clonar el repositorio
@@ -55,7 +53,6 @@ jobs:
         uses: docker://postgres:latest
         with:
           args: -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=solocali123# -e POSTGRES_DB=proyect_nest -p 5432:5432
-        # Aquí se configura un contenedor Docker para PostgreSQL en el pipeline de GitHub Actions
 
       # 3. Esperar a que PostgreSQL esté listo para aceptar conexiones
       - name: Wait for PostgreSQL to be ready
@@ -76,7 +73,4 @@ jobs:
           NODE_ENV: production
         run: |
           echo "Desplegando la aplicación"
-          # Aquí puedes agregar los comandos necesarios para hacer el deploy.
-          # Por ejemplo, si utilizas Docker, aquí va el comando para construir la imagen y correr el contenedor.
-          # docker build -t nest-app .
-          # docker run -d -p 3000:3000 --env DB_HOST=$DB_HOST --env DB_PORT=$DB_PORT --env DB_USERNAME=$DB_USERNAME --env DB_PASSWORD=$DB_PASSWORD --env DB_DATABASE=$DB_DATABASE nest-app
+          # Agrega los comandos necesarios para desplegar la aplicación.
