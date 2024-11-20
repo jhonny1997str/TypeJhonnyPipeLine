@@ -46,10 +46,11 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Pull de la imagen de Docker Hub
-      - name: Pull Docker image from Docker Hub
+      # Subir la imagen Docker a Docker Hub sin reconstruirla
+      - name: Push Docker image to Docker Hub
         run: |
-          docker pull jhonnystr/types-action:latest
+          docker tag types-action:latest jhonnystr/types-action:latest
+          docker push jhonnystr/types-action:latest
 
       # Configuración y ejecución del contenedor de PostgreSQL
       - name: Set up PostgreSQL container
