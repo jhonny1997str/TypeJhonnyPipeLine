@@ -50,13 +50,10 @@ jobs:
             sleep 2
           done
 
-      - name: Deploy application
-        env:
-          DB_HOST: localhost
-          DB_PORT: 5432
-          DB_USERNAME: postgres
-          DB_PASSWORD: solocali123#
-          DB_DATABASE: proyect_nest
-          NODE_ENV: production
+      - name: Build Docker image
         run: |
-          echo "Desplegando la aplicación"
+          docker build -t nestjs-app .
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 3000:3000 --link postgres:postgres --env DB_HOST=postgres --env DB_PORT=5432 --env DB_USERNAME=postgres --env DB_PASSWORD=solocali123# --env DB_DATABASE=proyect_nest nestjs-app
