@@ -73,4 +73,3 @@ jobs:
           NODE_ENV: production
         run: |
           echo "Desplegando la aplicación"
-          # Agrega los comandos necesarios para desplegar la aplicación.
