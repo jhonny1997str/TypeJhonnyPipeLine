@@ -23,7 +23,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18 # Usa la versión de Node.js que necesites
+          node-version: 18 # Usa la versión de Node.js 18 para evitar problemas de compatibilidad
           cache: 'npm' # Habilitar cache para las dependencias
 
       # 3. Instalar dependencias
@@ -45,21 +45,29 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' # Solo para la rama main
 
     steps:
       # 1. Clonar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Configurar PostgreSQL
+      # 2. Configurar PostgreSQL en Docker
       - name: Set up PostgreSQL
         uses: docker://postgres:latest
         with:
           args: -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=solocali123# -e POSTGRES_DB=proyect_nest -p 5432:5432
         # Aquí se configura un contenedor Docker para PostgreSQL en el pipeline de GitHub Actions
 
-      # 3. Desplegar la aplicación
+      # 3. Esperar a que PostgreSQL esté listo para aceptar conexiones
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 2
+          done
+
+      # 4. Desplegar la aplicación
       - name: Deploy application
         env:
           DB_HOST: localhost
@@ -70,4 +78,7 @@ jobs:
           NODE_ENV: production
         run: |
           echo "Desplegando la aplicación"
-          # Aquí puedes agregar los comandos necesarios para hacer el deploy
+          # Aquí puedes agregar los comandos necesarios para hacer el deploy.
+          # Por ejemplo, si utilizas Docker, aquí va el comando para construir la imagen y correr el contenedor.
+          # docker build -t nest-app .
+          # docker run -d -p 3000:3000 --env DB_HOST=$DB_HOST --env DB_PORT=$DB_PORT --env DB_USERNAME=$DB_USERNAME --env DB_PASSWORD=$DB_PASSWORD --env DB_DATABASE=$DB_DATABASE nest-app
