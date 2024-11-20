@@ -18,5 +18,8 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "types": ["node", "jest"] // Aquí agregamos 'jest'
-  }
+  },
+  "include": [
+    "src/**/*.ts" 
+  ]
 }
