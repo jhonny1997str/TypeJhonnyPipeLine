@@ -19,7 +19,8 @@
     "noFallthroughCasesInSwitch": false,
     "types": ["node", "jest"] // Aquí agregamos 'jest'
   },
-  "include": [
-    "src/**/*.ts" 
-  ]
+  
+    "include": ["src/**/*.ts", "test/**/*.ts"]
+  
+  
 }
