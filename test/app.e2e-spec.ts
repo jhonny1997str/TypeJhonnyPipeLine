@@ -49,7 +49,7 @@ describe('CustomerController (e2e)', () => {
       .get('/customers')
       .expect(200);
 
-    // Verificar que el usuario creado esté en la lista
+    // Verificar que el usuario creado esté en la listaa
     expect(response.body).toContainEqual({
       customerId: createdCustomerId,
       customerName: 'Carlos',
