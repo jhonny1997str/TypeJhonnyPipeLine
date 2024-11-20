@@ -45,15 +45,29 @@ jobs:
   deploy:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' # Solo para la rama main
+    if: github.ref == 'refs/heads/main'
 
     steps:
+      # 1. Clonar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2. Configurar PostgreSQL
+      - name: Set up PostgreSQL
+        uses: docker://postgres:latest
+        with:
+          args: -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=solocali123# -e POSTGRES_DB=proyect_nest -p 5432:5432
+        # Aquí se configura un contenedor Docker para PostgreSQL en el pipeline de GitHub Actions
+
+      # 3. Desplegar la aplicación
       - name: Deploy application
         env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USERNAME: postgres
+          DB_PASSWORD: solocali123#
+          DB_DATABASE: proyect_nest
           NODE_ENV: production
         run: |
-          echo "Aquí configura tu despliegue. Ejemplo: usar Docker, SSH o scripts específicos."
-
+          echo "Desplegando la aplicación"
+          # Aquí puedes agregar los comandos necesarios para hacer el deploy
