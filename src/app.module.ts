@@ -23,7 +23,8 @@ dotenv.config(); // Carga las variables de entorno desde el archivo .env. Esto p
       password: process.env.DB_PASSWORD, // Lee la contraseña de la base de datos desde las variables de entorno.
       database: process.env.DB_DATABASE, // Lee el nombre de la base de datos desde las variables de entorno.
       entities: [Customer], // Define las entidades que TypeORM debe usar para crear las tablas en la base de datos. En este caso, la entidad Customer.
-      synchronize: true, // Sincroniza automáticamente la base de datos con las entidades. Útil en desarrollo, pero no recomendado en producción.
+      synchronize: true,
+      logging: true,  // Sincroniza automáticamente la base de datos con las entidades. Útil en desarrollo, pero no recomendado en producción.
     }),
 
     // Importa el módulo CustomerModule, que encapsula toda la lógica relacionada con la entidad Customer.
