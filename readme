@@ -2,7 +2,7 @@ docker pull jhonnystr/types-action:latest
 
 Luego, puedes ejecutar el contenedor y conectarlo a la red personalizada mi_red con este comando:
 
-docker run -d --name types-action-container --network mi_red -p 3000:3000 jhonnystr/types-action:latest
+docker run -d --name types-action --network mi_red -p 3000:3000 jhonnystr/types-action:latest
 
 Remove-Item -Recurse -Force dist
 //compilar

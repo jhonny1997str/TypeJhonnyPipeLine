@@ -3,10 +3,10 @@ name: CI Pipeline for NestJS
 on:
   push:
     branches:
-      - main
+      - feature/Jhonny
   pull_request:
     branches:
-      - main
+      - feature/Jhonny
 
 jobs:
   build-and-test:
@@ -29,6 +29,9 @@ jobs:
 
       - name: Build project
         run: npm run build
+      
+      - name: Run Tests
+        run: npm test
 
   build-and-push-docker-image:
     needs: build-and-test

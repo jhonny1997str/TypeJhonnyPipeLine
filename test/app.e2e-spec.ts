@@ -1,61 +1,131 @@
 /* eslint-disable prettier/prettier */
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { CustomerController } from '../src/customer/customer.controller';
+import { CustomerService } from '../src/customer/customer.service';
+import { Customer } from '../src/customer/customer.entity';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
-describe('CustomerController (e2e)', () => {
-  let app: INestApplication;
+describe('CustomerController', () => {
+  let customerController: CustomerController;
+  //let customerService: CustomerService;
 
-  let createdCustomerId: number; // Variable para almacenar el ID del usuario creado
+  const mockCustomerService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+
+  let customer: Customer;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [CustomerController],
+      providers: [
+        {
+          provide: CustomerService,
+          useValue: mockCustomerService,
+        },
+      ],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    customerController = module.get<CustomerController>(CustomerController);
+    //customerService = module.get<CustomerService>(CustomerService);
+
+    // Crear un cliente único para todas las pruebas
+    customer = { customerId: 1, customerName: 'Juan Pérez', email: 'juan.perez@example.com' };
+    mockCustomerService.create.mockResolvedValue(customer);
+    mockCustomerService.findAll.mockResolvedValue([customer]);
+    mockCustomerService.findOne.mockResolvedValue(customer);
+    mockCustomerService.update.mockResolvedValue(customer);
   });
 
-  beforeEach(async () => {
-    // Crear un usuario antes de cada prueba
-    const response = await request(app.getHttpServer())
-      .post('/customers')
-      .send({
-        customerName: 'Carlos',
-        email: 'carlos@gmail.com',
-      })
-      .expect(201);
-
-    // Almacenar el ID del usuario creado
-    createdCustomerId = response.body.customerId;
+  beforeEach(() => {
+    jest.clearAllMocks(); // Limpiar mocks antes de cada prueba
   });
 
-  afterEach(async () => {
-    // Eliminar el usuario después de cada prueba
-    await request(app.getHttpServer())
-      .delete(`/customers/${createdCustomerId}`)
-      .expect(200);
+  afterEach(() => {
+    // Aquí puedes limpiar cualquier dato adicional si es necesario
   });
 
-  afterAll(async () => {
-    // Cerrar la aplicación al final de todas las pruebas
-    await app.close();
+  afterAll(() => {
+    // Cualquier limpieza después de todas las pruebas
   });
 
-  it('/customers (GET)', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/customers')
-      .expect(200);
+  it('debería estar definido', () => {
+    expect(customerController).toBeDefined();
+  });
 
-    // Verificar que el usuario creado esté en la listaa
-    expect(response.body).toContainEqual({
-      customerId: createdCustomerId,
-      customerName: 'Carlos',
-      email: 'carlos@gmail.com',
+  describe('create', () => {
+    it('debería crear un cliente correctamente', async () => {
+      const customerData: Partial<Customer> = { customerName: 'Juan Pérez', email: 'juan.perez@example.com' };
+
+      expect(await customerController.create(customerData)).toEqual(customer);
+      expect(mockCustomerService.create).toHaveBeenCalledWith(customerData);
+    });
+
+    it('debería lanzar un error cuando falte el nombre del cliente', async () => {
+      const customerData: Partial<Customer> = { email: 'juan.perez@example.com' };
+
+      mockCustomerService.create.mockRejectedValue(new HttpException('El nombre del cliente es obligatorio', HttpStatus.BAD_REQUEST));
+
+      await expect(customerController.create(customerData)).rejects.toThrowError(HttpException);
     });
   });
-  
 
+  describe('findAll', () => {
+    it('debería devolver un array de clientes', async () => {
+      expect(await customerController.findAll()).toEqual([customer]);
+    });
+
+    it('debería lanzar un error si findAll falla', async () => {
+      mockCustomerService.findAll.mockRejectedValue(new Error('Error al obtener los clientes.'));
+      await expect(customerController.findAll()).rejects.toThrowError(HttpException);
+    });
+  });
+
+  describe('findOne', () => {
+    it('debería devolver un cliente por ID', async () => {
+      expect(await customerController.findOne(1)).toEqual(customer);
+    });
+
+    it('debería lanzar un error si no se encuentra el cliente', async () => {
+      mockCustomerService.findOne.mockResolvedValue(null);
+
+      await expect(customerController.findOne(1)).rejects.toThrowError(new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND));
+    });
+  });
+
+  describe('update', () => {
+    it('debería actualizar un cliente correctamente', async () => {
+      const updatedData: Partial<Customer> = { customerName: 'Juan Pérez Actualizado' };
+      const updatedCustomer = { ...customer, ...updatedData };
+
+      mockCustomerService.update.mockResolvedValue(updatedCustomer);
+
+      expect(await customerController.update('1', updatedData)).toEqual(updatedCustomer);
+      expect(mockCustomerService.update).toHaveBeenCalledWith(1, updatedData);
+    });
+
+    it('debería lanzar un error si la actualización falla', async () => {
+      const updatedData: Partial<Customer> = { customerName: 'Juan Pérez Actualizado' };
+      mockCustomerService.update.mockRejectedValue(new Error('Error al actualizar el cliente.'));
+      await expect(customerController.update('1', updatedData)).rejects.toThrowError(HttpException);
+    });
+  });
+
+  describe('delete', () => {
+    it('debería eliminar un cliente correctamente', async () => {
+      mockCustomerService.delete.mockResolvedValue(undefined);
+
+      await expect(customerController.delete(1)).resolves.toBeUndefined();
+      expect(mockCustomerService.delete).toHaveBeenCalledWith(1);
+    });
+
+    it('debería lanzar un error si la eliminación falla', async () => {
+      mockCustomerService.delete.mockRejectedValue(new Error('Error al eliminar el cliente.'));
+      await expect(customerController.delete(1)).rejects.toThrowError(HttpException);
+    });
+  });
 });

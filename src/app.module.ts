@@ -11,14 +11,14 @@ import { Customer } from './customer/customer.entity'; // Importa la entidad Cus
     // Configura la conexión a la base de datos usando TypeORM.
     TypeOrmModule.forRoot({
       type: 'postgres', // Especifica el tipo de base de datos que se está utilizando. En este caso, PostgreSQL.
-      host: 'jhonnypostgres', // Usamos directamente el valor del host proporcionado.
+      host: 'localhost', // Usamos directamente el valor del host proporcionado.
       port: 5432, // Usamos el puerto proporcionado.
       username: 'postgres', // Usamos el nombre de usuario proporcionado.
       password: 'solocali123#', // Usamos la contraseña proporcionada.
       database: 'proyect_nest', // Usamos el nombre de la base de datos proporcionada.
       entities: [Customer], // Define las entidades que TypeORM debe usar para crear las tablas en la base de datos. En este caso, la entidad Customer.
       synchronize: true, // Sincroniza las entidades con la base de datos (No recomendado en producción)
-      logging: true, // Habilita el registro de SQL (útil en desarrollo)
+      // logging: true, // Habilita el registro de SQL (útil en desarrollo)
     }),
 
     // Importa el módulo CustomerModule, que encapsula toda la lógica relacionada con la entidad Customer.
