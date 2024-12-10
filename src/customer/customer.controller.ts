@@ -25,10 +25,10 @@ export class CustomerController {
   // Obtener todos los clientes con opciones de consulta y manejo de errores
   @Get()
   async findAll(
-    @Query('limit') limit: number = 2, // Valor predeterminado
-    @Query('offset') offset: number = 0, // Valor predeterminado
-    @Query('orderField') orderField: string = 'customerName', // Valor predeterminado
-    @Query('orderDirection') orderDirection: 'ASC' | 'DESC' = 'ASC', // Valor predeterminado
+    @Query('limit') limit: number = 2, 
+    @Query('offset') offset: number = 0, 
+    @Query('orderField') orderField: string = 'customerName', 
+    @Query('orderDirection') orderDirection: 'ASC' | 'DESC' = 'ASC',
   ): Promise<Customer[]> {
     try {
       const customers = await this.customerService.findAll(limit, offset, orderField, orderDirection);
@@ -61,11 +61,10 @@ export class CustomerController {
   // Actualizar un cliente
   @Put(':id')  // Ruta PUT que recibe el parámetro `id` en la URL
   async update(
-    @Param('id') id: string,  // Recibimos el id del cliente como parámetro en formato string
-    @Body() updateData: Partial<Customer>,  // Recibimos los datos a actualizar en el cuerpo de la solicitud
+    @Param('id') id: string,  
+    @Body() updateData: Partial<Customer>,  
   ): Promise<Customer> {
-    // Verificar si el id es un número positivo y solo contiene números
-    const idRegex = /^[0-9]+$/; // Expresión regular que permite solo números enteros positivos
+    const idRegex = /^[0-9]+$/; 
 
     if (!idRegex.test(id)) {
       throw new HttpException(
@@ -74,14 +73,11 @@ export class CustomerController {
       );
     }
 
-    // Convertir el id a número
     const customerId = Number(id);
 
     try {
-      // Llamamos al servicio para actualizar el cliente
       return await this.customerService.update(customerId, updateData);
     } catch (error) {
-      // Si ocurre algún error en el servicio, lanzamos una excepción HTTP con el mensaje de error
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -91,10 +87,8 @@ export class CustomerController {
   @Delete(':id') // Ruta DELETE que recibe el parámetro `id` en la URL
   async delete(@Param('id', ParseIntPipe) id: number): Promise<void> {
     try {
-      // Llamamos al servicio para eliminar al cliente
       return await this.customerService.delete(id);
     } catch (error) {
-      // Si ocurre algún error, lanzamos una excepción HTTP con un mensaje
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

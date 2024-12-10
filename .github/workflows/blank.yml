@@ -29,11 +29,14 @@ jobs:
 
       - name: Build project
         run: npm run build
+      
+      - name: Run Tests
+        run: npm test
 
   build-and-push-docker-image:
     needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature/Jhonny'
 
     steps:
       - name: Checkout repository
