@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
+// Desactiva las reglas de formato de Prettier para este archivo
+
 import { Test, TestingModule } from '@nestjs/testing';
-import { CustomerController } from '../src/customer/customer.controller';
-import { CustomerService } from '../src/customer/customer.service';
-import { Customer } from '../src/customer/customer.entity';
+import { CustomerController } from '../../src/customer/customer.controller';
+import { CustomerService } from '../../src/customer/customer.service';
+import { Customer } from '../../src/customer/customer.entity';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 describe('CustomerController', () => {
   let customerController: CustomerController;
-  //let customerService: CustomerService;
 
   const mockCustomerService = {
     create: jest.fn(),
@@ -18,6 +19,16 @@ describe('CustomerController', () => {
   };
 
   let customer: Customer;
+
+  beforeEach(() => {
+    customer = { customerId: 1, customerName: 'Juan Pérez', email: 'juan.perez@example.com' };
+
+    mockCustomerService.create.mockResolvedValue(customer);
+    mockCustomerService.findAll.mockResolvedValue([customer]);
+    mockCustomerService.findOne.mockResolvedValue(customer);
+    mockCustomerService.update.mockResolvedValue(customer);
+    mockCustomerService.delete.mockResolvedValue(undefined);
+  });
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,26 +42,6 @@ describe('CustomerController', () => {
     }).compile();
 
     customerController = module.get<CustomerController>(CustomerController);
-    //customerService = module.get<CustomerService>(CustomerService);
-
-    // Crear un cliente único para todas las pruebas
-    customer = { customerId: 1, customerName: 'Juan Pérez', email: 'juan.perez@example.com' };
-    mockCustomerService.create.mockResolvedValue(customer);
-    mockCustomerService.findAll.mockResolvedValue([customer]);
-    mockCustomerService.findOne.mockResolvedValue(customer);
-    mockCustomerService.update.mockResolvedValue(customer);
-  });
-
-  beforeEach(() => {
-    jest.clearAllMocks(); // Limpiar mocks antes de cada prueba
-  });
-
-  afterEach(() => {
-    // Aquí puedes limpiar cualquier dato adicional si es necesario
-  });
-
-  afterAll(() => {
-    // Cualquier limpieza después de todas las pruebas
   });
 
   it('debería estar definido', () => {
@@ -60,7 +51,6 @@ describe('CustomerController', () => {
   describe('create', () => {
     it('debería crear un cliente correctamente', async () => {
       const customerData: Partial<Customer> = { customerName: 'Juan Pérez', email: 'juan.perez@example.com' };
-
       expect(await customerController.create(customerData)).toEqual(customer);
       expect(mockCustomerService.create).toHaveBeenCalledWith(customerData);
     });
@@ -68,9 +58,13 @@ describe('CustomerController', () => {
     it('debería lanzar un error cuando falte el nombre del cliente', async () => {
       const customerData: Partial<Customer> = { email: 'juan.perez@example.com' };
 
-      mockCustomerService.create.mockRejectedValue(new HttpException('El nombre del cliente es obligatorio', HttpStatus.BAD_REQUEST));
+      mockCustomerService.create.mockRejectedValue(
+        new HttpException('El nombre del cliente es obligatorio', HttpStatus.BAD_REQUEST)
+      );
 
-      await expect(customerController.create(customerData)).rejects.toThrowError(HttpException);
+      await expect(customerController.create(customerData)).rejects.toThrowError(
+        new HttpException('El nombre del cliente es obligatorio', HttpStatus.BAD_REQUEST)
+      );
     });
   });
 
@@ -80,8 +74,13 @@ describe('CustomerController', () => {
     });
 
     it('debería lanzar un error si findAll falla', async () => {
-      mockCustomerService.findAll.mockRejectedValue(new Error('Error al obtener los clientes.'));
-      await expect(customerController.findAll()).rejects.toThrowError(HttpException);
+      mockCustomerService.findAll.mockRejectedValue(
+        new HttpException('Error al obtener los clientes.', HttpStatus.INTERNAL_SERVER_ERROR)
+      );
+
+      await expect(customerController.findAll()).rejects.toThrowError(
+        new HttpException('Error al obtener los clientes.', HttpStatus.INTERNAL_SERVER_ERROR)
+      );
     });
   });
 
@@ -93,7 +92,9 @@ describe('CustomerController', () => {
     it('debería lanzar un error si no se encuentra el cliente', async () => {
       mockCustomerService.findOne.mockResolvedValue(null);
 
-      await expect(customerController.findOne(1)).rejects.toThrowError(new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND));
+      await expect(customerController.findOne(1)).rejects.toThrowError(
+        new HttpException('Cliente no encontrado', HttpStatus.NOT_FOUND)
+      );
     });
   });
 
@@ -110,8 +111,13 @@ describe('CustomerController', () => {
 
     it('debería lanzar un error si la actualización falla', async () => {
       const updatedData: Partial<Customer> = { customerName: 'Juan Pérez Actualizado' };
-      mockCustomerService.update.mockRejectedValue(new Error('Error al actualizar el cliente.'));
-      await expect(customerController.update('1', updatedData)).rejects.toThrowError(HttpException);
+      mockCustomerService.update.mockRejectedValue(
+        new HttpException('Error al actualizar el cliente.', HttpStatus.INTERNAL_SERVER_ERROR)
+      );
+
+      await expect(customerController.update('1', updatedData)).rejects.toThrowError(
+        new HttpException('Error al actualizar el cliente.', HttpStatus.INTERNAL_SERVER_ERROR)
+      );
     });
   });
 
@@ -124,8 +130,13 @@ describe('CustomerController', () => {
     });
 
     it('debería lanzar un error si la eliminación falla', async () => {
-      mockCustomerService.delete.mockRejectedValue(new Error('Error al eliminar el cliente.'));
-      await expect(customerController.delete(1)).rejects.toThrowError(HttpException);
+      mockCustomerService.delete.mockRejectedValue(
+        new HttpException('Error al eliminar el cliente.', HttpStatus.INTERNAL_SERVER_ERROR)
+      );
+
+      await expect(customerController.delete(1)).rejects.toThrowError(
+        new HttpException('Error al eliminar el cliente.', HttpStatus.INTERNAL_SERVER_ERROR)
+      );
     });
   });
 });

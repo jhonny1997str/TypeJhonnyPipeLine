@@ -8,7 +8,7 @@ import { CustomerService } from './customer.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Customer]),  // Asegúrate de que esto esté aqu
+    TypeOrmModule.forFeature([Customer]),  
   ],
   controllers: [CustomerController],
   providers: [CustomerService],

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';  // Agregado HttpException y HttpStatus
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';  
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Customer } from './customer.entity';
@@ -15,12 +15,11 @@ export class CustomerService {
     try {
       const { customerName, email } = customerData;
   
-      // Validar si el customerName está vacío
+    
       if (!customerName || customerName.trim() === '') {
         throw new HttpException('El nombre del cliente es obligatorio', HttpStatus.BAD_REQUEST);
       }
   
-      // Validar que customerName solo contenga letras
       const nameRegex = /^[a-zA-Z]+$/;
       if (!nameRegex.test(customerName)) {
         throw new HttpException('El nombre del cliente solo debe contener letras', HttpStatus.BAD_REQUEST);
@@ -48,9 +47,8 @@ export class CustomerService {
       return await this.customerRepository.save(customer);
     } catch (error) {
       console.error('Error al crear el cliente:', error);
-      // Mejor manejo del error
       if (error instanceof HttpException) {
-        throw error; // Si es un HttpException, se relanza
+        throw error; 
       } else {
         throw new HttpException(
           'Hubo un error al intentar crear el cliente. Por favor, intente nuevamente.',
@@ -83,14 +81,14 @@ export class CustomerService {
   }
 
   // Obtener un cliente por ID con manejo de errores y validación de entrada
-  async findOne(customerId: number): Promise<Customer> {  // Cambié `id` por `customerId`
+  async findOne(customerId: number): Promise<Customer> {  
     try {
       if (isNaN(customerId) || customerId <= 0) {
         throw new Error('El ID debe ser un número válido y positivo');
       }
 
       const customer = await this.customerRepository.findOne({
-        where: { customerId },  // Cambié `id` por `customerId`
+        where: { customerId }, 
       });
 
       if (!customer) {
@@ -105,13 +103,11 @@ export class CustomerService {
   }
 // Actualizar un cliente
 async update(customerId: number, updateData: Partial<Customer>): Promise<Customer> {
-  // Verificar si el cliente existe
   const customer = await this.customerRepository.findOne({
     where: { customerId },  // Usamos `where` para pasar el `customerId`
   });
 
   if (!customer) {
-    // Lanzamos una excepción HTTP con código 404 (Not Found)
     throw new HttpException(
       `Cliente con id ${customerId} no encontrado`,
       HttpStatus.NOT_FOUND,
@@ -120,7 +116,6 @@ async update(customerId: number, updateData: Partial<Customer>): Promise<Custome
 
   // Validación de campos (por ejemplo, customerName y email)
   if (!updateData.customerName || updateData.customerName.trim() === '') {
-    // Lanzamos una excepción HTTP con código 400 (Bad Request)
     throw new HttpException(
       'El campo customerName es obligatorio',
       HttpStatus.BAD_REQUEST,
@@ -128,17 +123,14 @@ async update(customerId: number, updateData: Partial<Customer>): Promise<Custome
   }
 
   if (!updateData.email || updateData.email.trim() === '') {
-    // Lanzamos una excepción HTTP con código 400 (Bad Request)
     throw new HttpException(
       'El campo email es obligatorio',
       HttpStatus.BAD_REQUEST,
     );
   }
 
-  // Si se pasa un email, verificar su formato
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (updateData.email && !emailRegex.test(updateData.email)) {
-    // Lanzamos una excepción HTTP con código 400 (Bad Request)
     throw new HttpException(
       'El email proporcionado no es válido',
       HttpStatus.BAD_REQUEST,
@@ -147,14 +139,12 @@ async update(customerId: number, updateData: Partial<Customer>): Promise<Custome
 
   // Intentar actualizar el cliente
   try {
-    await this.customerRepository.update(customerId, updateData);  // El `update` sigue funcionando con `customerId`
+    await this.customerRepository.update(customerId, updateData); 
 
-    // Retornar el cliente actualizado directamente desde la base de datos
     const updatedCustomer = await this.customerRepository.findOne({
-      where: { customerId },  // Usamos `where` nuevamente para obtener el cliente actualizado
+      where: { customerId },  
     });
     if (!updatedCustomer) {
-      // Si el cliente no se encuentra después de la actualización, lanzamos un error 404
       throw new HttpException(
         `Cliente con id ${customerId} no encontrado después de la actualización`,
         HttpStatus.NOT_FOUND,
@@ -162,7 +152,6 @@ async update(customerId: number, updateData: Partial<Customer>): Promise<Custome
     }
     return updatedCustomer;
   } catch (error) {
-    // Lanzamos una excepción HTTP con código 400 (Bad Request) si ocurre un error al intentar actualizar
     throw new HttpException(
       'Error al actualizar el cliente: ' + error.message,
       HttpStatus.BAD_REQUEST,
@@ -173,7 +162,6 @@ async update(customerId: number, updateData: Partial<Customer>): Promise<Custome
 
   // Eliminar un cliente
   async delete(customerId: number): Promise<void> {
-    // Validamos que customerId sea un número positivo
     if (customerId <= 0) {
       throw new HttpException(
         'El ID debe ser un número positivo',
@@ -181,7 +169,6 @@ async update(customerId: number, updateData: Partial<Customer>): Promise<Custome
       );
     }
 
-    // Usamos `where` para pasar `customerId` correctamente
     const customer = await this.customerRepository.findOne({
       where: { customerId },  // Usamos `where` para pasar `customerId`
     });

@@ -3,10 +3,10 @@ name: CI Pipeline for NestJS
 on:
   push:
     branches:
-      - feature/Jhonny
+      - main
   pull_request:
     branches:
-      - feature/Jhonny
+      - main
 
 jobs:
   build-and-test:
